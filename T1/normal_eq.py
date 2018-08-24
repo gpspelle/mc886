@@ -72,30 +72,34 @@ with open('diamonds.csv', 'rt') as csvfile:
             del X_test[cont2][-4]
             X_test[cont2].pop(0)
             cont2+=1
+    
+# Feature value from 0 to 8
+f = 8
 
-    # Feature value from 0 to 8
-    f = 8
+feature_X_train = np.asarray([el[f] for el in X_train]).reshape(45849, 1)
+feature_X_test = np.asarray([el[f] for el in X_test]).reshape(8091, 1)
 
-    feature_X_train = np.asarray([el[f] for el in X_train]).reshape(45849, 1)
-    feature_X_test = np.asarray([el[f] for el in X_test]).reshape(8091, 1)
+feature_X_train_b = np.c_[np.ones((45849, 1)), feature_X_train]
+feature_X_test_b = np.c_[np.ones((8091, 1)), feature_X_test]
 
-    clf = linear_model.SGDRegressor(max_iter=100, verbose=1)
-    clf.fit(feature_X_train, y_train)
+Theta = np.linalg.inv(feature_X_train_b.T.dot(feature_X_train_b))
+Theta = Theta.dot(feature_X_train_b.T)
+Theta = Theta.dot(y_train)
 
-    predicted = clf.predict(feature_X_test)
+predicted = feature_X_test_b.dot(Theta)
 
-    print('Coefficients: \n', clf.coef_)
-    # The mean squared error
-    print("Mean squared error: %.2f" % mean_squared_error(y_test, predicted))
-    # Explained variance score: 1 is perfect prediction
-    print('Variance score: %.2f' % r2_score(y_test, predicted))
+print('Coefficients: \n', Theta)
+# The mean squared error
+print("Mean squared error: %.2f" % mean_squared_error(y_test, predicted))
+# Explained variance score: 1 is perfect prediction
+print('Variance score: %.2f' % r2_score(y_test, predicted))
 
-    # Plot outputs
-    plt.scatter(feature_X_test, y_test,  color='black')
-    plt.plot(feature_X_test, predicted, color='blue', linewidth=3)
+# Plot outputs
+plt.scatter(feature_X_test, y_test,  color='black')
+plt.plot(feature_X_test, predicted, color='blue', linewidth=3)
 
-    plt.xticks(())
-    plt.yticks(())
+plt.xticks(())
+plt.yticks(())
 
-    plt.show()
+plt.show()
 
