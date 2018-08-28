@@ -1,9 +1,46 @@
 import csv
 import matplotlib.pyplot as plt
-import numpy as np
-from sklearn import linear_model
+import random
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.utils import shuffle
+import numpy as np
 
+class my_SGDRegressor:
+
+
+    def __init__(self):
+        print("Hey ho, let's go")
+
+    def fit(self, X_train, y_train, max_iter, verbose):
+
+        self.x = np.asarray([1, 0], dtype='Float64')
+        self.theta = np.ones(2, dtype='Float64') # So far, Theta0 and Theta1
+        eta0 = 0.001
+        counter = 0
+        self.losses = np.zeros(max_iter)
+
+        while True:
+            # When this for ends an epoch has ended
+            for st in range(len(X_train)):
+                counter += 1
+                if counter >= max_iter:
+                    return self.losses
+
+                self.losses[counter] = (self.theta.dot(self.x) - y_train[st])**2
+                self.x[1] = X_train[st]
+                acc = self.theta.dot(self.x) - y_train[st]
+                self.theta[0] = self.theta[0] - acc*eta0
+                self.theta[1] = self.theta[1] - (acc*self.x[1]) * eta0
+                
+            X_train, y_train = shuffle(X_train, y_train, random_state=random.seed())
+        
+    def predict(self, X_test):
+
+        predicted = np.empty(len(X_test))
+        for i in range(len(X_test)):
+            predicted[i] = self.theta.dot(self.x)
+
+        return predicted
 
 X_test = []
 X_train = []
@@ -74,25 +111,28 @@ with open('diamonds.csv', 'rt') as csvfile:
             cont2+=1
 
     # Feature value from 0 to 8
-    f = 5
+    f = 8 
 
     feature_X_train = np.asarray([el[f] for el in X_train]).reshape(45849, 1)
     feature_X_test = np.asarray([el[f] for el in X_test]).reshape(8091, 1)
 
-    clf = linear_model.SGDRegressor(max_iter=100)
-    clf.fit(feature_X_train, y_train)
-
+    max_iter = 100
+    clf = my_SGDRegressor()
+    losses = clf.fit(feature_X_train, y_train, max_iter=max_iter, verbose=1)
     predicted = clf.predict(feature_X_test)
 
-    print('Coefficients: \n', clf.coef_)
+    print('Coefficients: \n', clf.theta)
     # The mean squared error
     print("Mean squared error: %.2f" % mean_squared_error(y_test, predicted))
     # Explained variance score: 1 is perfect prediction
     print('Variance score: %.2f' % r2_score(y_test, predicted))
 
     # Plot outputs
-    plt.scatter(feature_X_test, y_test,  color='black')
-    plt.plot(feature_X_test, predicted, color='blue', linewidth=3)
+    #plt.scatter(feature_X_test, y_test,  color='black')
+    #plt.plot(feature_X_test, predicted, color='blue', linewidth=3)
+    print(losses)
+    print(np.asarray(list(range(max_iter))))
+    plt.plot(np.asarray(list(range(max_iter))), losses, color='blue', linewidth=3)
 
     plt.xticks(())
     plt.yticks(())
