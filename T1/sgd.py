@@ -94,6 +94,7 @@ with open('diamonds.csv', 'rt') as csvfile:
     plt.scatter(feature_X_test, y_test,  color='black')
     plt.plot(feature_X_test, predicted, color='blue', linewidth=3)
 
+    plt.ylim(0.8*min(y_test), 1.2*max(y_test))
     plt.xticks(())
     plt.yticks(())
     plt.show()

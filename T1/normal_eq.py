@@ -74,19 +74,26 @@ with open('diamonds.csv', 'rt') as csvfile:
             cont2+=1
     
 # Feature value from 0 to 8
-f = 8
+#f = 5
 
-feature_X_train = np.asarray([el[f] for el in X_train]).reshape(45849, 1)
-feature_X_test = np.asarray([el[f] for el in X_test]).reshape(8091, 1)
+#feature_X_train = np.asarray([el[f] for el in X_train]).reshape(45849, 1)
+#feature_X_test = np.asarray([el[f] for el in X_test]).reshape(8091, 1)
 
-feature_X_train_b = np.c_[np.ones((45849, 1)), feature_X_train]
-feature_X_test_b = np.c_[np.ones((8091, 1)), feature_X_test]
+#feature_X_train_b = np.c_[np.ones((45849, 1)), feature_X_train]
+#feature_X_test_b = np.c_[np.ones((8091, 1)), feature_X_test]
 
-Theta = np.linalg.inv(feature_X_train_b.T.dot(feature_X_train_b))
-Theta = Theta.dot(feature_X_train_b.T)
+X_test = np.asarray(X_test)
+X_train = np.asarray(X_train)
+y_test = np.asarray(y_test)
+y_train = np.asarray(y_train)
+
+#Theta = np.linalg.inv(feature_X_train_b.T.dot(feature_X_train_b))
+#Theta = Theta.dot(feature_X_train_b.T)
+Theta = np.linalg.inv(X_train.T.dot(X_train))
+Theta = Theta.dot(X_train.T)
 Theta = Theta.dot(y_train)
 
-predicted = feature_X_test_b.dot(Theta)
+predicted = X_test.dot(Theta)
 
 print('Coefficients: \n', Theta)
 # The mean squared error
@@ -95,9 +102,10 @@ print("Mean squared error: %.2f" % mean_squared_error(y_test, predicted))
 print('Variance score: %.2f' % r2_score(y_test, predicted))
 
 # Plot outputs
-plt.scatter(feature_X_test, y_test,  color='black')
-plt.plot(feature_X_test, predicted, color='blue', linewidth=3)
+#plt.scatter(feature_X_test, y_test,  color='black')
+#plt.plot(feature_X_test, predicted, color='blue', linewidth=3)
 
+#plt.ylim(0.8*min(y_test), 1.2*max(y_test))
 plt.xticks(())
 plt.yticks(())
 

@@ -13,9 +13,9 @@ class my_SGDRegressor:
 
     def fit(self, X_train, y_train, max_iter, verbose):
 
-        self.x = np.asarray([1, 0], dtype='Float64')
-        self.theta = np.ones(2, dtype='Float64') # So far, Theta0 and Theta1
-        eta0 = 0.001
+        self.x = np.ones(len(X_train), dtype='Float64')
+        self.theta = np.ones(len(X_train), dtype='Float64')
+        eta0 = 0.01
         counter = 0
         self.losses = np.zeros(max_iter)
 
@@ -27,10 +27,12 @@ class my_SGDRegressor:
                     return self.losses
 
                 self.losses[counter] = (self.theta.dot(self.x) - y_train[st])**2
-                self.x[1] = X_train[st]
+                for i in range(len(X_train[st])):
+                    self.x[i+1] = X_train[st][i]
+
                 acc = self.theta.dot(self.x) - y_train[st]
-                self.theta[0] = self.theta[0] - acc*eta0
-                self.theta[1] = self.theta[1] - (acc*self.x[1]) * eta0
+                for i in range(len(X_train[st])):
+                    self.theta[i] = self.theta[i] - (acc*self.x[i]) * eta0 
                 
             X_train, y_train = shuffle(X_train, y_train, random_state=random.seed())
         
@@ -111,15 +113,19 @@ with open('diamonds.csv', 'rt') as csvfile:
             cont2+=1
 
     # Feature value from 0 to 8
-    f = 8 
+    #f = 8 
 
-    feature_X_train = np.asarray([el[f] for el in X_train]).reshape(45849, 1)
-    feature_X_test = np.asarray([el[f] for el in X_test]).reshape(8091, 1)
+    #feature_X_train = np.asarray([el[f] for el in X_train]).reshape(45849, 1)
+    #feature_X_test = np.asarray([el[f] for el in X_test]).reshape(8091, 1)
 
-    max_iter = 100
+    max_iter = 100 
+
     clf = my_SGDRegressor()
-    losses = clf.fit(feature_X_train, y_train, max_iter=max_iter, verbose=1)
-    predicted = clf.predict(feature_X_test)
+    #losses = clf.fit(feature_X_train, y_train, max_iter=max_iter, verbose=1)
+    losses = clf.fit(X_train, y_train, max_iter=max_iter, verbose=1)
+    #predicted = clf.predict(feature_X_test)
+    predicted = clf.predict(X_test)
+
 
     print('Coefficients: \n', clf.theta)
     # The mean squared error
@@ -134,6 +140,7 @@ with open('diamonds.csv', 'rt') as csvfile:
     print(np.asarray(list(range(max_iter))))
     plt.plot(np.asarray(list(range(max_iter))), losses, color='blue', linewidth=3)
 
+    #plt.ylim(0.8*min(y_test), 1.2*max(y_test))
     plt.xticks(())
     plt.yticks(())
     plt.show()
